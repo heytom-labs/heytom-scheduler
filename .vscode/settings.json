@@ -1,0 +1,113 @@
+{
+    // Go 语言配置
+    "go.useLanguageServer": true,
+    "go.lintTool": "golangci-lint",
+    "go.lintOnSave": "workspace",
+    "go.formatTool": "goimports",
+    "go.formatOnSave": true,
+    "go.testFlags": ["-v"],
+    "go.coverOnSave": false,
+    "go.coverageDecorator": {
+        "type": "gutter",
+        "coveredHighlightColor": "rgba(64,128,64,0.5)",
+        "uncoveredHighlightColor": "rgba(128,64,64,0.5)"
+    },
+    "go.toolsManagement.autoUpdate": true,
+    
+    // 编辑器配置
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+    },
+    "editor.rulers": [80, 120],
+    "editor.tabSize": 4,
+    "editor.insertSpaces": false,
+    
+    // 文件配置
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/node_modules": true,
+        "**/web-dist": true,
+        "**/*.exe": true
+    },
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/node_modules/**": true,
+        "**/web-dist/**": true
+    },
+    "files.associations": {
+        "*.yaml": "yaml",
+        "*.yml": "yaml",
+        "Dockerfile*": "dockerfile",
+        "*.proto": "proto3"
+    },
+    
+    // 搜索配置
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/web-dist": true,
+        "**/*.exe": true,
+        "**/vendor": true,
+        "**/.git": true
+    },
+    
+    // 终端配置
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
+    "terminal.integrated.profiles.windows": {
+        "Command Prompt": {
+            "path": "cmd.exe",
+            "icon": "terminal-cmd"
+        },
+        "PowerShell": {
+            "source": "PowerShell",
+            "icon": "terminal-powershell"
+        }
+    },
+    
+    // Vue 配置
+    "[vue]": {
+        "editor.defaultFormatter": "Vue.volar",
+        "editor.tabSize": 2
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features",
+        "editor.tabSize": 2
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features",
+        "editor.tabSize": 2
+    },
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features",
+        "editor.tabSize": 2
+    },
+    "[yaml]": {
+        "editor.defaultFormatter": "redhat.vscode-yaml",
+        "editor.tabSize": 2
+    },
+    
+    // Go 特定文件配置
+    "[go]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        },
+        "editor.tabSize": 4,
+        "editor.insertSpaces": false
+    },
+    "[go.mod]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        }
+    },
+    
+    // 调试配置
+    "debug.console.fontSize": 14,
+    "debug.console.lineHeight": 20,
+    "debug.internalConsoleOptions": "openOnSessionStart",
+    
+    // 推荐的扩展
+    "extensions.ignoreRecommendations": false
+}

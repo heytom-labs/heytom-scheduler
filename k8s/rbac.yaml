@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: task-scheduler
+  namespace: task-scheduler
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: task-scheduler-role
+  namespace: task-scheduler
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "endpoints"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: task-scheduler-rolebinding
+  namespace: task-scheduler
+subjects:
+- kind: ServiceAccount
+  name: task-scheduler
+  namespace: task-scheduler
+roleRef:
+  kind: Role
+  name: task-scheduler-role
+  apiGroup: rbac.authorization.k8s.io

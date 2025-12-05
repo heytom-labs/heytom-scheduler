@@ -1,0 +1,307 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "构建 Go 服务",
+            "type": "shell",
+            "command": "go",
+            "args": [
+                "build",
+                "-o",
+                "task-scheduler.exe",
+                "./cmd/scheduler"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": [
+                "$go"
+            ]
+        },
+        {
+            "label": "构建 Web UI",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "scripts\\build-web.bat"
+            ],
+            "windows": {
+                "command": "cmd",
+                "args": [
+                    "/c",
+                    "scripts\\build-web.bat"
+                ]
+            },
+            "linux": {
+                "command": "bash",
+                "args": [
+                    "-c",
+                    "./scripts/build-web.sh"
+                ]
+            },
+            "osx": {
+                "command": "bash",
+                "args": [
+                    "-c",
+                    "./scripts/build-web.sh"
+                ]
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "构建所有",
+            "dependsOn": [
+                "构建 Web UI",
+                "构建 Go 服务"
+            ],
+            "dependsOrder": "sequence",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "运行测试",
+            "type": "shell",
+            "command": "go",
+            "args": [
+                "test",
+                "-v",
+                "./..."
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": [
+                "$go"
+            ]
+        },
+        {
+            "label": "运行测试 (带覆盖率)",
+            "type": "shell",
+            "command": "go",
+            "args": [
+                "test",
+                "-v",
+                "-coverprofile=coverage.out",
+                "./..."
+            ],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": [
+                "$go"
+            ]
+        },
+        {
+            "label": "查看测试覆盖率",
+            "type": "shell",
+            "command": "go",
+            "args": [
+                "tool",
+                "cover",
+                "-html=coverage.out"
+            ],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "启动前端开发服务器",
+            "type": "shell",
+            "command": "npm",
+            "args": [
+                "run",
+                "dev"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/web"
+            },
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "group": "dev"
+            },
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^([^\\s].*)\\((\\d+|\\d+,\\d+|\\d+,\\d+,\\d+,\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+)\\s*:\\s*(.*)$",
+                    "file": 1,
+                    "location": 2,
+                    "severity": 3,
+                    "code": 4,
+                    "message": 5
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^.*VITE.*",
+                    "endsPattern": "^.*Local:.*"
+                }
+            }
+        },
+        {
+            "label": "停止前端开发服务器",
+            "type": "shell",
+            "command": "echo",
+            "args": [
+                "请手动停止前端开发服务器"
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "清理构建文件",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "del /Q task-scheduler.exe & rmdir /S /Q web-dist"
+            ],
+            "windows": {
+                "command": "cmd",
+                "args": [
+                    "/c",
+                    "if exist task-scheduler.exe del /Q task-scheduler.exe & if exist web-dist rmdir /S /Q web-dist"
+                ]
+            },
+            "linux": {
+                "command": "bash",
+                "args": [
+                    "-c",
+                    "rm -f task-scheduler && rm -rf web-dist"
+                ]
+            },
+            "osx": {
+                "command": "bash",
+                "args": [
+                    "-c",
+                    "rm -f task-scheduler && rm -rf web-dist"
+                ]
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "格式化 Go 代码",
+            "type": "shell",
+            "command": "go",
+            "args": [
+                "fmt",
+                "./..."
+            ],
+            "group": "none",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "安装 Go 依赖",
+            "type": "shell",
+            "command": "go",
+            "args": [
+                "mod",
+                "download"
+            ],
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "安装 Web 依赖",
+            "type": "shell",
+            "command": "npm",
+            "args": [
+                "install"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/web"
+            },
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Docker Compose 启动",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": [
+                "up",
+                "-d"
+            ],
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Docker Compose 停止",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": [
+                "down"
+            ],
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Docker Compose 查看日志",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": [
+                "logs",
+                "-f",
+                "task-scheduler-1"
+            ],
+            "isBackground": true,
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        }
+    ]
+}

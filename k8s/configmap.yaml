@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: task-scheduler-config
+  namespace: task-scheduler
+data:
+  config.yaml: |
+    server:
+      http_port: 8080
+      grpc_port: 9090
+      metrics_port: 9091
+      shutdown_timeout: 30s
+
+    scheduler:
+      node_id: ${HOSTNAME}
+      worker_pool_size: 20
+      task_poll_interval: 5s
+      heartbeat_interval: 10s
+      heartbeat_timeout: 30s
+
+    database:
+      type: mysql
+      host: mysql-service
+      port: 3306
+      name: task_scheduler
+      user: scheduler
+      password: ${DB_PASSWORD}
+      max_open_conns: 50
+      max_idle_conns: 10
+      conn_max_lifetime: 5m
+
+    lock:
+      type: redis
+      redis:
+        host: redis-service
+        port: 6379
+        password: ${REDIS_PASSWORD}
+        db: 0
+        ttl: 30s
+        retry_interval: 1s
+        max_retries: 3
+
+    discovery:
+      type: kubernetes
+      kubernetes:
+        namespace: task-scheduler
+        label_selector: app=task-scheduler
+
+    log:
+      level: info
+      format: json
+      output: stdout
+
+    metrics:
+      enabled: true
+      path: /metrics

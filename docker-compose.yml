@@ -1,0 +1,188 @@
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: task-scheduler-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: task_scheduler
+      MYSQL_USER: scheduler
+      MYSQL_PASSWORD: schedulerpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./scripts/init-mysql.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - task-scheduler-network
+
+  # Redis for distributed locking
+  redis:
+    image: redis:7-alpine
+    container_name: task-scheduler-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - task-scheduler-network
+
+  # Consul for service discovery
+  consul:
+    image: consul:latest
+    container_name: task-scheduler-consul
+    ports:
+      - "8500:8500"
+      - "8600:8600/udp"
+    command: agent -server -ui -bootstrap-expect=1 -client=0.0.0.0
+    volumes:
+      - consul_data:/consul/data
+    healthcheck:
+      test: ["CMD", "consul", "members"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - task-scheduler-network
+
+  # Task Scheduler Backend (Node 1)
+  task-scheduler-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: task-scheduler-node-1
+    environment:
+      - NODE_ID=node-1
+      - HTTP_PORT=8080
+      - GRPC_PORT=9090
+      - METRICS_PORT=9091
+      - DB_TYPE=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=task_scheduler
+      - DB_USER=scheduler
+      - DB_PASSWORD=schedulerpass
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CONSUL_HOST=consul
+      - CONSUL_PORT=8500
+      - LOG_LEVEL=info
+      - LOG_FORMAT=json
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+      - "9091:9091"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      consul:
+        condition: service_healthy
+    volumes:
+      - ./config.dev.yaml:/app/config.yaml:ro
+    networks:
+      - task-scheduler-network
+    restart: unless-stopped
+
+  # Task Scheduler Backend (Node 2) - for testing multi-node
+  task-scheduler-2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: task-scheduler-node-2
+    environment:
+      - NODE_ID=node-2
+      - HTTP_PORT=8080
+      - GRPC_PORT=9090
+      - METRICS_PORT=9091
+      - DB_TYPE=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=task_scheduler
+      - DB_USER=scheduler
+      - DB_PASSWORD=schedulerpass
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CONSUL_HOST=consul
+      - CONSUL_PORT=8500
+      - LOG_LEVEL=info
+      - LOG_FORMAT=json
+    ports:
+      - "8081:8080"
+      - "9092:9090"
+      - "9093:9091"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      consul:
+        condition: service_healthy
+    volumes:
+      - ./config.dev.yaml:/app/config.yaml:ro
+    networks:
+      - task-scheduler-network
+    restart: unless-stopped
+
+  # Note: Admin UI is now integrated into the backend service
+  # Access it at http://localhost:8080/
+
+  # Prometheus for metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: task-scheduler-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - task-scheduler-network
+    restart: unless-stopped
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: task-scheduler-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      - prometheus
+    networks:
+      - task-scheduler-network
+    restart: unless-stopped
+
+networks:
+  task-scheduler-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
+  consul_data:
+  prometheus_data:
+  grafana_data:

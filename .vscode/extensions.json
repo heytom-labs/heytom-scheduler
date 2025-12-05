@@ -1,0 +1,25 @@
+{
+	"recommendations": [
+		// Go 开发
+		"golang.go",
+		// Vue 开发
+		"vue.volar",
+		"vue.vscode-typescript-vue-plugin",
+		// 通用工具
+		"ms-vscode.vscode-typescript-next",
+		"dbaeumer.vscode-eslint",
+		"esbenp.prettier-vscode",
+		// YAML 和配置文件
+		"redhat.vscode-yaml",
+		// Docker
+		"ms-azuretools.vscode-docker",
+		// Proto
+		"zxh404.vscode-proto3",
+		// Git
+		"eamodio.gitlens",
+		// 其他实用工具
+		"streetsidesoftware.code-spell-checker",
+		"wayou.vscode-todo-highlight",
+		"gruntfuggly.todo-tree"
+	]
+}
