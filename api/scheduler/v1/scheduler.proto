@@ -1,0 +1,267 @@
+syntax = "proto3";
+
+package scheduler.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "heytom-scheduler/api/scheduler/v1;v1";
+option java_multiple_files = true;
+option java_package = "dev.kratos.api.scheduler.v1";
+option java_outer_classname = "SchedulerProtoV1";
+
+// 任务调度服务定义
+service Scheduler {
+  // 创建任务
+  rpc CreateTask (CreateTaskRequest) returns (TaskReply) {
+    option (google.api.http) = {
+      post: "/api/v1/tasks"
+      body: "*"
+    };
+  }
+
+  // 获取任务详情
+  rpc GetTask (GetTaskRequest) returns (TaskReply) {
+    option (google.api.http) = {
+      get: "/api/v1/tasks/{id}"
+    };
+  }
+
+  // 更新任务
+  rpc UpdateTask (UpdateTaskRequest) returns (TaskReply) {
+    option (google.api.http) = {
+      put: "/api/v1/tasks/{id}"
+      body: "*"
+    };
+  }
+
+  // 删除任务
+  rpc DeleteTask (DeleteTaskRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/tasks/{id}"
+    };
+  }
+
+  // 任务列表查询
+  rpc ListTasks (ListTasksRequest) returns (ListTasksReply) {
+    option (google.api.http) = {
+      get: "/api/v1/tasks"
+    };
+  }
+
+  // 立即执行任务
+  rpc ExecuteTask (ExecuteTaskRequest) returns (TaskExecutionReply) {
+    option (google.api.http) = {
+      post: "/api/v1/tasks/{id}/execute"
+      body: "*"
+    };
+  }
+
+  // 暂停任务
+  rpc PauseTask (PauseTaskRequest) returns (TaskReply) {
+    option (google.api.http) = {
+      post: "/api/v1/tasks/{id}/pause"
+      body: "*"
+    };
+  }
+
+  // 恢复任务
+  rpc ResumeTask (ResumeTaskRequest) returns (TaskReply) {
+    option (google.api.http) = {
+      post: "/api/v1/tasks/{id}/resume"
+      body: "*"
+    };
+  }
+
+  // 获取任务执行历史
+  rpc GetTaskExecutions (GetTaskExecutionsRequest) returns (ListExecutionsReply) {
+    option (google.api.http) = {
+      get: "/api/v1/tasks/{task_id}/executions"
+    };
+  }
+
+  // 获取单次执行详情
+  rpc GetExecution (GetExecutionRequest) returns (ExecutionReply) {
+    option (google.api.http) = {
+      get: "/api/v1/executions/{id}"
+    };
+  }
+
+  // 取消执行中的任务
+  rpc CancelExecution (CancelExecutionRequest) returns (ExecutionReply) {
+    option (google.api.http) = {
+      post: "/api/v1/executions/{id}/cancel"
+      body: "*"
+    };
+  }
+}
+
+// 任务类型枚举
+enum TaskType {
+  TASK_TYPE_UNSPECIFIED = 0;
+  IMMEDIATE = 1;      // 立即执行
+  SCHEDULED = 2;      // 指定时间执行
+  CRON = 3;           // Cron 表达式执行
+  INTERVAL = 4;       // 固定间隔执行
+}
+
+// 任务状态枚举
+enum TaskStatus {
+  TASK_STATUS_UNSPECIFIED = 0;
+  PENDING = 1;        // 等待中
+  RUNNING = 2;        // 运行中
+  PAUSED = 3;         // 已暂停
+  COMPLETED = 4;      // 已完成
+  FAILED = 5;         // 失败
+  CANCELLED = 6;      // 已取消
+}
+
+// 执行状态枚举
+enum ExecutionStatus {
+  EXECUTION_STATUS_UNSPECIFIED = 0;
+  QUEUED = 1;         // 队列中
+  EXECUTING = 2;      // 执行中
+  SUCCESS = 3;        // 成功
+  EXECUTION_FAILED = 4;     // 失败
+  TIMEOUT = 5;        // 超时
+  EXECUTION_CANCELLED = 6;  // 已取消
+}
+
+// 创建任务请求
+message CreateTaskRequest {
+  string name = 1;                    // 任务名称
+  string description = 2;             // 任务描述
+  TaskType type = 3;                  // 任务类型
+  string schedule = 4;                // 调度配置：
+                                      // - IMMEDIATE: 可为空
+                                      // - SCHEDULED: RFC3339格式时间戳，如 "2024-12-31T15:04:05Z"
+                                      // - CRON: Cron表达式，如 "0 */5 * * * *"
+                                      // - INTERVAL: 间隔秒数，如 "300" 表示每5分钟
+  string handler = 5;                 // 处理器名称
+  string payload = 6;                 // 任务负载（JSON格式）
+  int32 timeout = 7;                  // 超时时间（秒）
+  map<string, string> metadata = 8;  // 元数据
+}
+
+// 获取任务请求
+message GetTaskRequest {
+  int64 id = 1;
+}
+
+// 更新任务请求
+message UpdateTaskRequest {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  string schedule = 4;
+  string payload = 5;
+  int32 timeout = 6;
+  map<string, string> metadata = 7;
+}
+
+// 删除任务请求
+message DeleteTaskRequest {
+  int64 id = 1;
+}
+
+// 任务列表请求
+message ListTasksRequest {
+  int32 page = 1;               // 页码
+  int32 page_size = 2;          // 每页数量
+  TaskStatus status = 3;        // 状态筛选
+  TaskType type = 4;            // 类型筛选
+  string keyword = 5;           // 关键词搜索
+}
+
+// 执行任务请求
+message ExecuteTaskRequest {
+  int64 id = 1;
+  string payload = 2;           // 可选的负载覆盖
+}
+
+// 暂停任务请求
+message PauseTaskRequest {
+  int64 id = 1;
+}
+
+// 恢复任务请求
+message ResumeTaskRequest {
+  int64 id = 1;
+}
+
+// 获取任务执行历史请求
+message GetTaskExecutionsRequest {
+  int64 task_id = 1;
+  int32 page = 2;
+  int32 page_size = 3;
+  ExecutionStatus status = 4;
+}
+
+// 获取执行详情请求
+message GetExecutionRequest {
+  int64 id = 1;
+}
+
+// 取消执行请求
+message CancelExecutionRequest {
+  int64 id = 1;
+}
+
+// 任务响应
+message TaskReply {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  TaskType type = 4;
+  TaskStatus status = 5;
+  string schedule = 6;
+  string handler = 7;
+  string payload = 8;
+  int32 timeout = 9;
+  map<string, string> metadata = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
+  google.protobuf.Timestamp next_run_time = 13;  // 下次执行时间
+  int64 execution_count = 14;                     // 执行次数
+  int64 success_count = 15;                       // 成功次数
+  int64 failed_count = 16;                        // 失败次数
+}
+
+// 任务列表响应
+message ListTasksReply {
+  repeated TaskReply tasks = 1;
+  int64 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+// 任务执行响应
+message TaskExecutionReply {
+  int64 execution_id = 1;
+  string message = 2;
+}
+
+// 执行记录响应
+message ExecutionReply {
+  int64 id = 1;
+  int64 task_id = 2;
+  string task_name = 3;
+  ExecutionStatus status = 4;
+  string node_id = 5;                           // 执行节点ID
+  google.protobuf.Timestamp start_time = 6;
+  google.protobuf.Timestamp end_time = 7;
+  int32 duration = 8;                           // 执行耗时（毫秒）
+  string result = 9;                            // 执行结果
+  string error = 10;                            // 错误信息
+  int32 retry_count = 11;                       // 重试次数
+  string payload = 12;                          // 执行负载
+}
+
+// 执行历史列表响应
+message ListExecutionsReply {
+  repeated ExecutionReply executions = 1;
+  int64 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}

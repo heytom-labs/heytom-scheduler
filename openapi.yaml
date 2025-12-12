@@ -1,0 +1,500 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: ""
+    version: 0.0.1
+paths:
+    /api/v1/executions/{id}:
+        get:
+            tags:
+                - Scheduler
+            description: 获取单次执行详情
+            operationId: Scheduler_GetExecution
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/scheduler.v1.ExecutionReply'
+    /api/v1/executions/{id}/cancel:
+        post:
+            tags:
+                - Scheduler
+            description: 取消执行中的任务
+            operationId: Scheduler_CancelExecution
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/scheduler.v1.CancelExecutionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/scheduler.v1.ExecutionReply'
+    /api/v1/tasks:
+        get:
+            tags:
+                - Scheduler
+            description: 任务列表查询
+            operationId: Scheduler_ListTasks
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: status
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+                - name: type
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+                - name: keyword
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/scheduler.v1.ListTasksReply'
+        post:
+            tags:
+                - Scheduler
+            description: 创建任务
+            operationId: Scheduler_CreateTask
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/scheduler.v1.CreateTaskRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/scheduler.v1.TaskReply'
+    /api/v1/tasks/{id}:
+        get:
+            tags:
+                - Scheduler
+            description: 获取任务详情
+            operationId: Scheduler_GetTask
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/scheduler.v1.TaskReply'
+        put:
+            tags:
+                - Scheduler
+            description: 更新任务
+            operationId: Scheduler_UpdateTask
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/scheduler.v1.UpdateTaskRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/scheduler.v1.TaskReply'
+        delete:
+            tags:
+                - Scheduler
+            description: 删除任务
+            operationId: Scheduler_DeleteTask
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /api/v1/tasks/{id}/execute:
+        post:
+            tags:
+                - Scheduler
+            description: 立即执行任务
+            operationId: Scheduler_ExecuteTask
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/scheduler.v1.ExecuteTaskRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/scheduler.v1.TaskExecutionReply'
+    /api/v1/tasks/{id}/pause:
+        post:
+            tags:
+                - Scheduler
+            description: 暂停任务
+            operationId: Scheduler_PauseTask
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/scheduler.v1.PauseTaskRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/scheduler.v1.TaskReply'
+    /api/v1/tasks/{id}/resume:
+        post:
+            tags:
+                - Scheduler
+            description: 恢复任务
+            operationId: Scheduler_ResumeTask
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/scheduler.v1.ResumeTaskRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/scheduler.v1.TaskReply'
+    /api/v1/tasks/{taskId}/executions:
+        get:
+            tags:
+                - Scheduler
+            description: 获取任务执行历史
+            operationId: Scheduler_GetTaskExecutions
+            parameters:
+                - name: taskId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: status
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/scheduler.v1.ListExecutionsReply'
+    /helloworld/{name}:
+        get:
+            tags:
+                - Greeter
+            description: Sends a greeting
+            operationId: Greeter_SayHello
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/helloworld.v1.HelloReply'
+components:
+    schemas:
+        helloworld.v1.HelloReply:
+            type: object
+            properties:
+                message:
+                    type: string
+            description: The response message containing the greetings
+        scheduler.v1.CancelExecutionRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+            description: 取消执行请求
+        scheduler.v1.CreateTaskRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                description:
+                    type: string
+                type:
+                    type: integer
+                    format: enum
+                schedule:
+                    type: string
+                handler:
+                    type: string
+                    description: |-
+                        - IMMEDIATE: 可为空
+                         - SCHEDULED: RFC3339格式时间戳，如 "2024-12-31T15:04:05Z"
+                         - CRON: Cron表达式，如 "0 */5 * * * *"
+                         - INTERVAL: 间隔秒数，如 "300" 表示每5分钟
+                payload:
+                    type: string
+                timeout:
+                    type: integer
+                    format: int32
+                metadata:
+                    type: object
+                    additionalProperties:
+                        type: string
+            description: 创建任务请求
+        scheduler.v1.ExecuteTaskRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                payload:
+                    type: string
+            description: 执行任务请求
+        scheduler.v1.ExecutionReply:
+            type: object
+            properties:
+                id:
+                    type: string
+                taskId:
+                    type: string
+                taskName:
+                    type: string
+                status:
+                    type: integer
+                    format: enum
+                nodeId:
+                    type: string
+                startTime:
+                    type: string
+                    format: date-time
+                endTime:
+                    type: string
+                    format: date-time
+                duration:
+                    type: integer
+                    format: int32
+                result:
+                    type: string
+                error:
+                    type: string
+                retryCount:
+                    type: integer
+                    format: int32
+                payload:
+                    type: string
+            description: 执行记录响应
+        scheduler.v1.ListExecutionsReply:
+            type: object
+            properties:
+                executions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/scheduler.v1.ExecutionReply'
+                total:
+                    type: string
+                page:
+                    type: integer
+                    format: int32
+                pageSize:
+                    type: integer
+                    format: int32
+            description: 执行历史列表响应
+        scheduler.v1.ListTasksReply:
+            type: object
+            properties:
+                tasks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/scheduler.v1.TaskReply'
+                total:
+                    type: string
+                page:
+                    type: integer
+                    format: int32
+                pageSize:
+                    type: integer
+                    format: int32
+            description: 任务列表响应
+        scheduler.v1.PauseTaskRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+            description: 暂停任务请求
+        scheduler.v1.ResumeTaskRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+            description: 恢复任务请求
+        scheduler.v1.TaskExecutionReply:
+            type: object
+            properties:
+                executionId:
+                    type: string
+                message:
+                    type: string
+            description: 任务执行响应
+        scheduler.v1.TaskReply:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                type:
+                    type: integer
+                    format: enum
+                status:
+                    type: integer
+                    format: enum
+                schedule:
+                    type: string
+                handler:
+                    type: string
+                payload:
+                    type: string
+                timeout:
+                    type: integer
+                    format: int32
+                metadata:
+                    type: object
+                    additionalProperties:
+                        type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                nextRunTime:
+                    type: string
+                    format: date-time
+                executionCount:
+                    type: string
+                successCount:
+                    type: string
+                failedCount:
+                    type: string
+            description: 任务响应
+        scheduler.v1.UpdateTaskRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                schedule:
+                    type: string
+                payload:
+                    type: string
+                timeout:
+                    type: integer
+                    format: int32
+                metadata:
+                    type: object
+                    additionalProperties:
+                        type: string
+            description: 更新任务请求
+tags:
+    - name: Greeter
+      description: The greeting service definition.
+    - name: Scheduler
+      description: 任务调度服务定义
